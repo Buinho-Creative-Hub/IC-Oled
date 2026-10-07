@@ -1,6 +1,6 @@
 {
     "name": "ic-oled",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "Live intensity bar, scrolling graph and activity meter for a 128x64 SSD1306 OLED. Buinho FabLab / Invisible Cartographies.",
     "dependencies": {
         "core": "*"

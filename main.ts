@@ -3,7 +3,7 @@
  * Made by Buinho FabLab for the Invisible Cartographies project.
  */
 
-//% color="#534AB7" icon="" block="Sensory OLED" weight=90
+//% color="#534AB7" icon="\uf1de" block="Sensory OLED" weight=90
 //% groups='["Intensity", "Activity", "Display"]'
 namespace sensoryOLED {
     const W = 128
@@ -119,6 +119,21 @@ namespace sensoryOLED {
 
     function textRight(xRight: number, y: number, s: string): void {
         text(xRight - s.length * 6 + 2, y, s)
+    }
+
+
+    function textScaled(x: number, y: number, s: string, k: number): void {
+        for (let n = 0; n < s.length; n++) {
+            let code = s.charCodeAt(n)
+            if (code < 32 || code > 122) code = 63
+            const base = (code - 32) * 5
+            for (let col = 0; col < 5; col++) {
+                const bits = FONT[base + col]
+                for (let row = 0; row < 8; row++) {
+                    if (bits & (1 << row)) fillRect(x + (n * 6 + col) * k, y + row * k, k, k)
+                }
+            }
+        }
     }
 
     function fmt(v: number): string {
@@ -247,6 +262,76 @@ namespace sensoryOLED {
     //% group="Intensity" weight=80
     export function resetGraph(): void {
         history = []
+    }
+
+    // ---------- big number ----------
+
+    /**
+     * Shows one value as a big number in the middle of the screen, with a small label.
+     * Easy to read from a distance.
+     * @param value the reading to show, eg: 50
+     * @param label the word shown on top, eg: "SOUND"
+     * @param unit the unit shown under the number, eg: "dB"
+     */
+    //% blockId=sensoryoled_big
+    //% block="big number $value||label $label unit $unit"
+    //% value.defl=50 label.defl="SOUND" unit.defl="dB"
+    //% expandableArgumentMode="toggle" inlineInputMode=inline
+    //% group="Intensity" weight=95
+    export function bigNumber(value: number, label?: string, unit?: string): void {
+        if (label === undefined || label === null) label = "SOUND"
+        if (unit === undefined || unit === null) unit = ""
+        const t = fmt(value)
+        let k = 4
+        if (t.length > 5) k = 3
+        if (t.length > 7) k = 2
+        clearBuffer()
+        text(Math.round((W - label.length * 6) / 2), 0, label)
+        const w = t.length * 6 * k - k
+        textScaled(Math.round((W - w) / 2), 14, t, k)
+        if (unit.length > 0) text(Math.round((W - unit.length * 6) / 2), 56, unit)
+        show()
+    }
+
+    // ---------- averaging ----------
+
+    let avgTimes: number[][] = [[], [], []]
+    let avgValues: number[][] = [[], [], []]
+
+    /**
+     * The average of a reading over the last few seconds.
+     * A single reading depends on the exact moment; the average is steadier.
+     * Use it inside a forever loop so it collects readings all the time.
+     * Use a different channel (1, 2 or 3) for each sensor you average.
+     * @param value the reading to average, eg: 50
+     * @param seconds how many seconds to average over, eg: 5
+     * @param channel 1, 2 or 3, one per sensor, eg: 1
+     */
+    //% blockId=sensoryoled_avg
+    //% block="average of $value over $seconds s||channel $channel"
+    //% value.defl=50 seconds.defl=5 channel.min=1 channel.max=3 channel.defl=1
+    //% expandableArgumentMode="toggle" inlineInputMode=inline
+    //% group="Intensity" weight=75
+    export function average(value: number, seconds: number, channel?: number): number {
+        if (channel === undefined || channel === null) channel = 1
+        channel = Math.max(1, Math.min(3, Math.round(channel))) - 1
+        if (seconds <= 0) seconds = 1
+        const now = control.millis()
+        const ts = avgTimes[channel]
+        const vs = avgValues[channel]
+        ts.push(now)
+        vs.push(value)
+        while (ts.length > 1 && now - ts[0] > seconds * 1000) {
+            ts.shift()
+            vs.shift()
+        }
+        while (ts.length > 200) {
+            ts.shift()
+            vs.shift()
+        }
+        let sum = 0
+        for (let i = 0; i < vs.length; i++) sum += vs[i]
+        return Math.round(sum / vs.length)
     }
 
     // ---------- sound in dB ----------

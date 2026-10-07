@@ -23,6 +23,15 @@ The last 128 readings as a line that scrolls from right to left. Expand (+) to a
 **activity meter** `PIR at P1 detects motion`
 Each movement fills the meter; when nothing moves it empties (10 s by default). Shows movements in the last minute. Also: `activity level` (0–100) and `movements per minute` to log with the datalogger.
 
+**big number** `value`
+One value in large digits in the middle of the screen, readable from a distance. Expand (+) for the label and unit.
+
+**average of** `value` **over 5 s**
+A steadier reading: the average of the last few seconds instead of the exact moment. Use one channel (1, 2 or 3) per sensor.
+
+**dB from sound level** `level`
+Converts the micro:bit V2 sound level (0-255) to approximate decibels (35-100 dB). Uncalibrated.
+
 **Display:** `clear OLED`, `show text on line`, and `start OLED at address` (only if your display is not at address 60 = 0x3C).
 
 Put any number in the value slot: the noise sensor, the light sensor, the Sonar:bit distance, the micro:bit's own `sound level` or `light level`.
