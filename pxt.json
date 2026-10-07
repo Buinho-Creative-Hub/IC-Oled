@@ -1,0 +1,23 @@
+{
+    "name": "ic-oled",
+    "version": "0.1.0",
+    "description": "Live intensity bar, scrolling graph and activity meter for a 128x64 SSD1306 OLED. Buinho FabLab / Invisible Cartographies.",
+    "dependencies": {
+        "core": "*"
+    },
+    "files": [
+        "README.md",
+        "main.ts"
+    ],
+    "testFiles": [
+        "test.ts"
+    ],
+    "public": true,
+    "supportedTargets": [
+        "microbit"
+    ],
+    "preferredEditor": "blocksprj",
+    "testDependencies": {
+        "microphone": "*"
+    }
+}
