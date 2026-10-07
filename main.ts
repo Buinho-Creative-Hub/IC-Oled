@@ -3,7 +3,7 @@
  * Made by Buinho FabLab for the Invisible Cartographies project.
  */
 
-//% color="#534AB7" icon="" block="Sensory OLED" weight=90
+//% color="#534AB7" icon="" block="Sensory OLED" weight=90
 //% groups='["Intensity", "Activity", "Display"]'
 namespace sensoryOLED {
     const W = 128
@@ -247,6 +247,23 @@ namespace sensoryOLED {
     //% group="Intensity" weight=80
     export function resetGraph(): void {
         history = []
+    }
+
+    // ---------- sound in dB ----------
+
+    /**
+     * Converts the micro:bit V2 sound level (0-255) to approximate decibels.
+     * The micro:bit maps 35 dB to 0 and 100 dB to 255, so the result is between 35 and 100.
+     * Uncalibrated: good for comparing places, not for official measurements.
+     * @param level the micro:bit sound level from 0 to 255, eg: 128
+     */
+    //% blockId=sensoryoled_db block="dB from sound level $level"
+    //% level.min=0 level.max=255 level.defl=128
+    //% group="Intensity" weight=70
+    export function toDecibels(level: number): number {
+        if (level < 0) level = 0
+        if (level > 255) level = 255
+        return Math.round(35 + level * 65 / 255)
     }
 
     // ---------- activity meter ----------
